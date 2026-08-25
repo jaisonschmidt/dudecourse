@@ -1,0 +1,55 @@
+{
+  "name": "@dudecourse/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=20.11.0 <21",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "build": "nx run-many -t build --all",
+    "test": "nx run-many -t test --all",
+    "lint": "nx run-many -t lint --all",
+    "format": "nx format:write",
+    "format:check": "nx format:check",
+    "graph": "nx graph",
+    "affected:build": "nx affected -t build",
+    "affected:test": "nx affected -t test",
+    "affected:lint": "nx affected -t lint"
+  },
+  "dependencies": {
+    "@angular/core": "17.3.12",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.3"
+  },
+  "devDependencies": {
+    "@nx/angular": "19.8.14",
+    "@nx/eslint": "19.8.14",
+    "@nx/eslint-plugin": "19.8.14",
+    "@nx/jest": "19.8.14",
+    "@nx/js": "19.8.14",
+    "@nx/node": "19.8.14",
+    "@nx/playwright": "19.8.14",
+    "@nx/workspace": "19.8.14",
+    "@swc-node/register": "~1.9.1",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
+    "eslint": "~8.57.0",
+    "nx": "19.8.14",
+    "prettier": "^3.3.3",
+    "typescript": "~5.4.5"
+  },
+  "overrides": {
+    "@angular/animations": "17.3.12",
+    "@angular/common": "17.3.12",
+    "@angular/compiler": "17.3.12",
+    "@angular/compiler-cli": "17.3.12",
+    "@angular/core": "17.3.12",
+    "@angular/forms": "17.3.12",
+    "@angular/platform-browser": "17.3.12",
+    "@angular/platform-browser-dynamic": "17.3.12",
+    "@angular/router": "17.3.12"
+  }
+}
