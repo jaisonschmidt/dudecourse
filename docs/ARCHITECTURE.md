@@ -39,13 +39,14 @@ Two things to note:
 
 ```
 apps/                  Deployable applications (none yet)
-libs/                  Shared libraries (none yet)
+libs/database/         Prisma schema, client, migrations, and seed tooling
 docs/
   PRD.md               Product requirements — source of truth for behavior
   ARCHITECTURE.md      This document
   ONBOARDING.md        How to get productive in this repo
   adr/                 Architecture Decision Records
 nx.json                Workspace config, target defaults, generator defaults
+compose.yaml           Local PostgreSQL 16
 tsconfig.base.json     Path aliases for libraries
 .eslintrc.json         Lint config, including module boundary rules
 .nvmrc                 Pinned Node version
@@ -58,7 +59,7 @@ tsconfig.base.json     Path aliases for libraries
 | Portal        | `apps/portal`        | Angular 17 SPA         | `type:app`, `scope:portal` | Planned |
 | API           | `apps/api`           | Fastify service        | `type:app`, `scope:api`    | Planned |
 | UI library    | `libs/ui`            | Buildable Angular lib  | `type:lib`, `scope:ui`     | Planned |
-| Database      | `libs/database`      | Prisma schema + client | `type:lib`, `scope:db`     | Planned |
+| Database      | `libs/database`      | Prisma schema + client | `type:lib`, `scope:db`     | Active  |
 | Shared domain | `libs/shared/domain` | TS types / DTOs        | `type:lib`, `scope:shared` | Planned |
 
 ### Portal — `apps/portal`
@@ -83,9 +84,15 @@ future module to reuse it without dragging in this product's API contract.
 
 ### Database — `libs/database`
 
-Owns `schema.prisma`, the generated Prisma client, the migration history, and any seed scripts.
-Because v1 has no admin UI ([PRD open question 1](PRD.md#9-open-questions)), seeding is currently
-the only intended way to add courses and lessons.
+Owns `schema.prisma`, the generated Prisma client, migration history, and seed scripts. The schema
+is intentionally model-free until identifiers, constraints, authentication storage, and deletion
+behavior are decided. Local/HML seed tooling exists, but the production content-entry process is
+still [an open question](PRD.md#9-open-questions).
+
+Local development uses PostgreSQL 16 in Docker Compose. HML and PRD use separate managed PostgreSQL
+16 instances. Committed migrations are manually promoted through protected GitHub Environments, HML
+first and then the exact same revision to PRD. See [DATABASE.md](DATABASE.md) and
+[ADR 0003](adr/0003-database-lifecycle.md).
 
 ### Shared domain — `libs/shared/domain`
 
@@ -212,15 +219,16 @@ The migration path out is documented in
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
 | AuthN      | Email/password + OAuth, JWT issued by the API                                                                                | Not implemented                  |
 | AuthZ      | Learners may only read/modify their own enrollments, progress, certificates ([PRD §7](PRD.md#7-non-functional-requirements)) | Not implemented                  |
-| Secrets    | Environment variables; `DATABASE_URL` for Prisma. Never committed                                                            | Not implemented                  |
+| Secrets    | Local `.env`; hosted `DATABASE_URL` values in GitHub Environments. Never committed                                           | Database path active             |
 | Testing    | Jest for unit tests, Playwright for e2e                                                                                      | Configured as generator defaults |
 | Formatting | Prettier, enforced via `npm run format:check`                                                                                | Active                           |
-| CI         | Intended to use `nx affected` to scope work to changed projects                                                              | Not set up                       |
+| CI         | Database checks plus manual HML/PRD migration and HML seed workflows                                                         | Database path active             |
 
 ## 8. Decisions
 
 - [ADR 0001 — Tech Stack](adr/0001-tech-stack.md)
 - [ADR 0002 — Monorepo Layout](adr/0002-monorepo-layout.md)
+- [ADR 0003 — Database Lifecycle and Environments](adr/0003-database-lifecycle.md)
 
 New architectural decisions belong in a new ADR rather than an edit to this file; this document
 describes the current state, while ADRs record why it is that way.

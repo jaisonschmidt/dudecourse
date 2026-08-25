@@ -1,0 +1,55 @@
+name: Migrate database
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options:
+          - hml
+          - prd
+      ref:
+        description: Git branch, tag, or commit tested in HML
+        required: true
+        default: main
+        type: string
+      confirm_production:
+        description: HML passed and a current backup or PITR point exists
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-migrate-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Check production confirmation
+        if: inputs.environment == 'prd' && inputs.confirm_production != true
+        run: |
+          echo "Production requires successful HML checks and a current backup or PITR point."
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Record deployment revision
+        run: echo "Database migration revision $(git rev-parse HEAD) targeting ${{ inputs.environment }}" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run db:validate
+      - run: npm run db:migrate:deploy
+      - run: npm run db:migrate:status

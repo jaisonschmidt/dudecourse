@@ -19,7 +19,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@dudecourse/database": ["libs/database/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

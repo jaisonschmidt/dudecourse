@@ -10,8 +10,9 @@ of silently deviating.
 
 ## Current Status
 
-The **Nx monorepo scaffold exists**, but **no applications or libraries have been created yet**.
-`apps/` and `libs/` are empty by design.
+The Nx monorepo scaffold and `libs/database` project exist. The portal, API, UI, and shared domain
+projects have not been created yet. The Prisma schema is intentionally model-free until the product
+data model is decided.
 
 The stack has been chosen and recorded — see [docs/adr](docs/adr/). Do not re-decide it.
 
@@ -19,6 +20,7 @@ The stack has been chosen and recorded — see [docs/adr](docs/adr/). Do not re-
   projects and the dependency rules between them.
 - [docs/ONBOARDING.md](docs/ONBOARDING.md) — setup, commands, and the exact generator command for
   each planned project.
+- [docs/DATABASE.md](docs/DATABASE.md) — local PostgreSQL, migrations, and HML/PRD promotion.
 
 ## Stack (decided — see [ADR 0001](docs/adr/0001-tech-stack.md))
 
@@ -49,9 +51,9 @@ npm run build              # build all projects
 npm run format             # apply Prettier
 npm run affected:lint      # scope to changed projects (prefer while working)
 npm run graph              # visualize the project graph
+npm run db:up              # start local PostgreSQL
+npm run db:migrate:deploy  # apply committed migrations locally
 ```
-
-Commands operating on "all projects" are currently no-ops — there are no projects.
 
 ## Working Agreements for AI Agents
 
@@ -72,4 +74,8 @@ Commands operating on "all projects" are currently no-ops — there are no proje
   rather than letting decisions live only in code or chat history.
 - Ask before making structural or hard-to-reverse decisions (e.g., choosing a database, changing the
   auth model, altering the data model in ways that affect existing data).
+- Database migrations are append-only after reaching HML. Create migrations only locally; hosted
+  environments accept committed migrations through the manual GitHub Actions workflow.
+- Never run `prisma migrate dev`, `prisma db push`, reset, or seed against PRD. Seeds are limited to
+  local and HML. Follow [docs/DATABASE.md](docs/DATABASE.md).
 - Keep this file (`AGENTS.md`) up to date as the project evolves.

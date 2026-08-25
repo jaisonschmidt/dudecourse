@@ -23,12 +23,12 @@ rather than quietly deviating.
 
 ## 2. Prerequisites
 
-| Tool    | Version     | Notes                                                             |
-| ------- | ----------- | ----------------------------------------------------------------- |
-| Node.js | **20.11.0** | Pinned in `.nvmrc`. Angular 17 does **not** support Node 22+.     |
-| npm     | 10+         | Ships with Node 20.                                               |
-| Git     | any recent  |                                                                   |
-| Docker  | optional    | For running PostgreSQL locally, once the database project exists. |
+| Tool    | Version     | Notes                                                         |
+| ------- | ----------- | ------------------------------------------------------------- |
+| Node.js | **20.11.0** | Pinned in `.nvmrc`. Angular 17 does **not** support Node 22+. |
+| npm     | 10+         | Ships with Node 20.                                           |
+| Git     | any recent  |                                                               |
+| Docker  | recent      | Required when working with the local PostgreSQL database.     |
 
 **Use the pinned Node version.** This is not optional — Angular 17 builds fail on newer runtimes:
 
@@ -49,13 +49,16 @@ git clone https://github.com/jaisonschmidt/dudecourse.git
 cd dudecourse
 nvm use
 npm install
+cp .env.example .env
+npm run db:up
+npm run db:migrate:deploy
 ```
 
 Verify the workspace is healthy:
 
 ```sh
 npx nx --version   # Local: v19.8.14
-npx nx graph       # opens the project graph (currently empty)
+npx nx graph       # opens the project graph
 ```
 
 ### About `npm audit`
@@ -78,6 +81,8 @@ Nx caches results, so re-running an unchanged target is nearly instant.
 | `npm run build`        | Build every project                       |
 | `npm run format`       | Apply Prettier formatting                 |
 | `npm run format:check` | Verify formatting (use in CI)             |
+| `npm run db:up`        | Start local PostgreSQL                    |
+| `npm run db:down`      | Stop local PostgreSQL                     |
 
 Scoped to what you actually changed — prefer these while working:
 
@@ -159,15 +164,8 @@ npx nx g @nx/js:library domain \
 
 ### Database library
 
-```sh
-npx nx g @nx/js:library database \
-  --directory=libs/database \
-  --bundler=tsc \
-  --tags=type:lib,scope:db
-```
-
-Then add Prisma inside it, with `schema.prisma`, the migration history, and a seed script. Since v1
-has no admin UI, seeding is the intended way to get courses and lessons into the catalog.
+`libs/database` already exists. Do not generate it again. Follow [DATABASE.md](DATABASE.md) for
+schema changes, local Docker commands, seeding, and hosted promotion.
 
 ## 6. Where does my code go?
 
@@ -227,7 +225,9 @@ If it changes what the product _does_, update [PRD.md](PRD.md) too.
 | `enforce-module-boundaries` lint error      | Intentional. Your import crosses an architectural boundary — see §6 above.                                                                        |
 | Import of a new lib not resolving           | The path alias in `tsconfig.base.json` is missing; it is added by the generator. Confirm you used a generator.                                    |
 | Stale or inexplicable build output          | `npx nx reset`, then retry.                                                                                                                       |
-| `nx graph` shows no projects                | Expected — nothing has been generated yet.                                                                                                        |
+| Port 5432 is already allocated              | Change `POSTGRES_PORT` and the matching `DATABASE_URL` port in local `.env`. See [DATABASE.md](DATABASE.md#troubleshooting).                      |
+| Local database is unhealthy                 | Run `npm run db:logs`; check Docker resources and local environment values.                                                                       |
+| Prisma cannot find `DATABASE_URL`           | Copy `.env.example` to `.env`. Never use a hosted URL in a local file.                                                                            |
 
 ## 10. Getting help
 

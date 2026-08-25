@@ -1,0 +1,68 @@
+{
+  "name": "database",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/database/src",
+  "projectType": "library",
+  "tags": ["type:lib", "scope:db"],
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma generate --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "validate": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma validate --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "migrate-dev": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma migrate dev --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "migrate-deploy": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma migrate deploy --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "migrate-status": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma migrate status --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma db seed --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "studio": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "prisma studio --schema=libs/database/prisma/schema.prisma"
+      }
+    },
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/database",
+        "main": "libs/database/src/index.ts",
+        "tsConfig": "libs/database/tsconfig.lib.json",
+        "assets": ["libs/database/*.md"]
+      }
+    }
+  }
+}
