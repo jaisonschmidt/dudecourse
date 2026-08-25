@@ -11,8 +11,8 @@ of silently deviating.
 ## Current Status
 
 The Nx monorepo scaffold and `libs/database` project exist. The portal, API, UI, and shared domain
-projects have not been created yet. The Prisma schema is intentionally model-free until the product
-data model is decided.
+projects have not been created yet. The Prisma schema now contains the v1 data model and its initial
+migration — see [ADR 0004](docs/adr/0004-initial-data-model.md).
 
 The stack has been chosen and recorded — see [docs/adr](docs/adr/). Do not re-decide it.
 

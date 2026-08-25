@@ -1,8 +1,9 @@
 # Database Guide
 
 `libs/database` owns the Prisma schema, generated client boundary, migration history, and seed entry
-point. The API will be its only application consumer. Product models have not been designed yet, so
-the schema currently contains no models or migrations.
+point. The API will be its only application consumer. The schema implements the PRD entities across
+seven tables — `users`, `auth_accounts`, `courses`, `lessons`, `enrollments`, `lesson_progress`, and
+`certificates`. The rationale for that structure is [ADR 0004](adr/0004-initial-data-model.md).
 
 ## Environments
 
@@ -100,8 +101,12 @@ no-op.
 
 ## Seeding
 
-The seed entry point is fail-closed and requires `APP_ENV=local` or `APP_ENV=hml`. Keep seeds
-idempotent by using stable identifiers and upserts once fixtures are introduced.
+The seed entry point is fail-closed and requires `APP_ENV=local` or `APP_ENV=hml`. It is also the
+catalog content-entry mechanism for v1, since there is no admin UI. Fixtures live in
+`libs/database/prisma/seed.ts` and upsert on stable identifiers (`courses.slug` and
+`(courseId, position)` for lessons), so repeated runs converge instead of duplicating rows. Removing
+a lesson from a fixture removes it from the database; keep that in mind once real learners have
+progress. Add or edit a course by editing that file and re-running the seed.
 
 Local `.env` already sets `APP_ENV=local`. HML uses the separate **Seed HML database** workflow,
 which is hard-bound to the `hml` GitHub Environment. There is no production seed path while the

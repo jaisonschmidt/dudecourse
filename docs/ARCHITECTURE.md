@@ -85,9 +85,9 @@ future module to reuse it without dragging in this product's API contract.
 ### Database — `libs/database`
 
 Owns `schema.prisma`, the generated Prisma client, migration history, and seed scripts. The schema
-is intentionally model-free until identifiers, constraints, authentication storage, and deletion
-behavior are decided. Local/HML seed tooling exists, but the production content-entry process is
-still [an open question](PRD.md#9-open-questions).
+implements the PRD entities as `users`, `auth_accounts`, `courses`, `lessons`, `enrollments`,
+`lesson_progress`, and `certificates` — see [ADR 0004](adr/0004-initial-data-model.md). Until an
+admin UI exists, the guarded local/HML seed is the catalog content-entry mechanism.
 
 Local development uses PostgreSQL 16 in Docker Compose. HML and PRD use separate managed PostgreSQL
 16 instances. Committed migrations are manually promoted through protected GitHub Environments, HML
@@ -229,6 +229,7 @@ The migration path out is documented in
 - [ADR 0001 — Tech Stack](adr/0001-tech-stack.md)
 - [ADR 0002 — Monorepo Layout](adr/0002-monorepo-layout.md)
 - [ADR 0003 — Database Lifecycle and Environments](adr/0003-database-lifecycle.md)
+- [ADR 0004 — Initial Data Model](adr/0004-initial-data-model.md)
 
 New architectural decisions belong in a new ADR rather than an edit to this file; this document
 describes the current state, while ADRs record why it is that way.
