@@ -1,6 +1,8 @@
 # Database Library
 
 This Nx library owns the Prisma schema, client boundary, migration history, and seed entry point.
+For day-to-day workflows, safety rules, and AI-agent checklists, start with
+[Database Onboarding](./ONBOARDING.md).
 See the repository [Database Guide](../../docs/DATABASE.md) for local setup, commands, migration
 rules, and HML/PRD promotion.
 

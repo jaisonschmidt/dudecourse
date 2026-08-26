@@ -165,7 +165,8 @@ npx nx g @nx/js:library domain \
 ### Database library
 
 `libs/database` already exists. Do not generate it again. Follow [DATABASE.md](DATABASE.md) for
-schema changes, local Docker commands, seeding, and hosted promotion.
+schema changes, local Docker commands, seeding, and hosted promotion. For a focused quick-start,
+see [libs/database onboarding](../libs/database/ONBOARDING.md).
 
 ## 6. Where does my code go?
 

@@ -59,6 +59,11 @@ npm run db:migrate:deploy  # apply committed migrations locally
 
 - **Create projects only with Nx generators**, never by hand-copying folders. The exact commands are
   in [docs/ONBOARDING.md](docs/ONBOARDING.md#5-creating-a-project).
+- **Create an onboarding document for every new app or library.** Add an `ONBOARDING.md` in the
+  project root (for example, `apps/<name>/ONBOARDING.md` or `libs/<name>/ONBOARDING.md`) with at
+  least: project purpose, main commands, local run/test/build flow, dependency-boundary notes, and
+  links to canonical docs. Add a short link to that onboarding from [docs/ONBOARDING.md](docs/ONBOARDING.md)
+  so new contributors can discover it quickly.
 - **Every project must declare a `type:` and a `scope:` tag.** An untagged project is silently
   exempt from the module boundary rules, which defeats the architecture.
 - **Respect the dependency rules** in [ARCHITECTURE.md §5](docs/ARCHITECTURE.md#5-dependency-rules).
