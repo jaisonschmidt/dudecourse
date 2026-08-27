@@ -1,8 +1,31 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import { database } from '@dudecourse/database';
+
+interface CourseListItem {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  lessonCount: number;
+}
+
+interface CourseWithLessonCount {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  _count: {
+    lessons: number;
+  };
+}
 
 export function createApp() {
   const app = Fastify({ logger: true });
+
+  app.register(cors, {
+    origin: '*',
+  });
 
   app.get('/healthz', async () => ({ ok: true }));
 
@@ -27,7 +50,7 @@ export function createApp() {
       },
     });
 
-    return courses.map((course) => ({
+    return courses.map((course: CourseWithLessonCount): CourseListItem => ({
       id: course.id,
       slug: course.slug,
       title: course.title,
