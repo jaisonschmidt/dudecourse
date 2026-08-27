@@ -84,3 +84,7 @@ npm run db:migrate:deploy  # apply committed migrations locally
 - Never run `prisma migrate dev`, `prisma db push`, reset, or seed against PRD. Seeds are limited to
   local and HML. Follow [docs/DATABASE.md](docs/DATABASE.md).
 - Keep this file (`AGENTS.md`) up to date as the project evolves.
+
+# Guidances for agents
+- When implementing prefer TDD aproach
+- After implementing, verify if commands are working: npx nx lint APPNAME, npx nx test APPNAME and npx nx build APPNAME, if some of them fail correct the problems.

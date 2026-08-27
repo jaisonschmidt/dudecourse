@@ -144,6 +144,9 @@ npx nx g @nx/node:application api \
   --tags=type:app,scope:api
 ```
 
+`apps/api` already exists. For endpoints, dependency boundaries, and the local run/test/build flow,
+see [apps/api onboarding](../apps/api/ONBOARDING.md).
+
 ### UI library — buildable Angular library
 
 ```sh
