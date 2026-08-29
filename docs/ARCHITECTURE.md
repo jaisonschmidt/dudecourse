@@ -1,8 +1,9 @@
 # Architecture — Dude Course
 
-> **Status: scaffold only.** The Nx workspace exists and is configured, but **no applications or
-> libraries have been created yet**. Everything in [Section 3](#3-projects) marked _Planned_
-> describes the agreed target, not code that exists today.
+> **Status: early implementation.** The database foundation and the first read-only catalog slice
+> of the API and portal exist. Authentication, enrollment, video playback, progress tracking, and
+> certificates are still target v1 behavior. See [Section 3](#3-projects) for the status of each
+> project.
 >
 > Product scope lives in [PRD.md](PRD.md). Technology decisions live in [docs/adr](adr/). This
 > document explains how the pieces fit together.
@@ -38,8 +39,13 @@ Two things to note:
 ## 2. Repository Layout
 
 ```
-apps/                  Deployable applications (none yet)
-libs/database/         Prisma schema, client, migrations, and seed tooling
+apps/
+  api/                 Fastify API (initial read-only catalog slice)
+  api-e2e/             API end-to-end test project
+  portal/              Angular SPA (initial catalog and lesson-list slice)
+  portal-e2e/          Portal Playwright project
+libs/
+  database/            Prisma schema, client, migrations, and seed tooling
 docs/
   PRD.md               Product requirements — source of truth for behavior
   ARCHITECTURE.md      This document
@@ -54,30 +60,45 @@ tsconfig.base.json     Path aliases for libraries
 
 ## 3. Projects
 
-| Project       | Path                 | Type                   | Tags                       | Status  |
-| ------------- | -------------------- | ---------------------- | -------------------------- | ------- |
-| Portal        | `apps/portal`        | Angular 17 SPA         | `type:app`, `scope:portal` | Planned |
-| API           | `apps/api`           | Fastify service        | `type:app`, `scope:api`    | Planned |
-| UI library    | `libs/ui`            | Buildable Angular lib  | `type:lib`, `scope:ui`     | Planned |
-| Database      | `libs/database`      | Prisma schema + client | `type:lib`, `scope:db`     | Active  |
-| Shared domain | `libs/shared/domain` | TS types / DTOs        | `type:lib`, `scope:shared` | Planned |
+| Project       | Path                 | Type                   | Tags                       | Status                     |
+| ------------- | -------------------- | ---------------------- | -------------------------- | -------------------------- |
+| Portal        | `apps/portal`        | Angular 17 SPA         | `type:app`, `scope:portal` | In progress: catalog slice |
+| Portal e2e    | `apps/portal-e2e`    | Playwright e2e         | Not set                    | Generated                  |
+| API           | `apps/api`           | Fastify service        | `type:app`, `scope:api`    | Active: catalog reads      |
+| API e2e       | `apps/api-e2e`       | Jest e2e               | Not set                    | Generated                  |
+| UI library    | `libs/ui`            | Buildable Angular lib  | `type:lib`, `scope:ui`     | Planned                    |
+| Database      | `libs/database`      | Prisma schema + client | `type:lib`, `scope:db`     | Active                     |
+| Shared domain | `libs/shared/domain` | TS types / DTOs        | `type:lib`, `scope:shared` | Planned                    |
+
+The missing tags on the generated e2e projects do not satisfy the repository rule that every Nx
+project declares both a `type:` and a `scope:` tag. Correcting that project metadata is a separate
+follow-up; the table records the repository as it exists today.
 
 ### Portal — `apps/portal`
 
-The learner-facing Angular 17 single-page application, using standalone components. Owns routing,
-screens, and view state. Renders shared components from `libs/ui` and calls the API for all data.
+The learner-facing Angular 17 single-page application uses standalone components and owns routing,
+screens, and view state. The current slice has a catalog page and a course route that lists ordered
+lessons from the API. It does not yet implement authentication, enrollment, YouTube playback,
+progress, or certificates.
+
+The target portal renders presentational components from the planned `libs/ui` library and shares
+API contracts through the planned `libs/shared/domain` library. It must call the API for all data.
 
 ### API — `apps/api`
 
-A Fastify service exposing authentication (email/password plus OAuth) and the endpoints backing the
-PRD's features: catalog, course detail, enrollment, progress, certificates. It is the **only**
-project permitted to reach the database.
+A Fastify service and the **only** application permitted to reach the database. The current slice
+exposes `GET /healthz`, `GET /courses`, and `GET /courses/:slug/lessons`. Catalog routes are
+currently unauthenticated.
+
+The target v1 API also owns email/password and OAuth authentication, authorization, course detail,
+enrollment, progress, and certificate endpoints.
 
 ### UI library — `libs/ui`
 
-Presentational Angular components shared between the portal and future modules. Buildable via
-ng-packagr but **not published** to a registry — it is consumed inside the monorepo through the
-`@dudecourse/ui` path alias.
+This project has not been created yet. It will contain presentational Angular components shared
+between the portal and future modules. It will be buildable via
+ng-packagr but **not published** to a registry — it will be consumed inside the monorepo through
+the `@dudecourse/ui` path alias.
 
 It is deliberately kept free of HTTP and persistence concerns. That restriction is what allows a
 future module to reuse it without dragging in this product's API contract.
@@ -96,11 +117,37 @@ first and then the exact same revision to PRD. See [DATABASE.md](DATABASE.md) an
 
 ### Shared domain — `libs/shared/domain`
 
-DTOs and entity types used by both the portal and the API, so a change to a contract is a single
-edit rather than two that can silently drift. It contains types and pure functions only — no
-framework imports.
+This project has not been created yet. It will contain DTOs and entity types used by both the portal
+and the API, so a change to a contract is a single edit rather than two that can silently drift. It
+will contain types and pure functions only — no framework imports.
 
 ## 4. Runtime Topology
+
+### Current catalog slice
+
+The implemented slice is read-only and does not require authentication:
+
+```mermaid
+sequenceDiagram
+    participant L as Learner
+    participant P as Portal
+    participant A as API
+    participant D as PostgreSQL
+
+    L->>P: Browse catalog or open course
+    P->>A: GET /courses
+    A->>D: Query published courses
+    D-->>A: Course rows and lesson counts
+    A-->>P: Catalog
+    P->>A: GET /courses/:slug/lessons
+    A->>D: Query published course lessons
+    D-->>A: Ordered lessons
+    A-->>P: Lesson list
+```
+
+### Target v1 flow
+
+The following sequence records the agreed destination. It is not implemented yet:
 
 ```mermaid
 sequenceDiagram
@@ -111,7 +158,7 @@ sequenceDiagram
     participant D as PostgreSQL
 
     L->>P: Open lesson
-    P->>A: GET /courses/:id (auth: JWT)
+    P->>A: GET /courses/:slug (auth: JWT)
     A->>D: Query course + progress
     D-->>A: Rows
     A-->>P: Course + lesson list + progress
@@ -126,8 +173,8 @@ sequenceDiagram
 
 ### Progress tracking
 
-Lessons are marked complete automatically once watch progress crosses a threshold — the portal
-observes player events and reports to the API. The exact percentage is
+In the target v1 flow, lessons are marked complete automatically once watch progress crosses a
+threshold. The portal observes player events and reports to the API. The exact percentage is
 [an open question in the PRD](PRD.md#9-open-questions) and must be a single configured value, not a
 number duplicated across the client and server.
 
@@ -136,8 +183,8 @@ cannot be trusted to also decide completion.
 
 ### Certificates
 
-Certificate issuance is triggered server-side when the final lesson of an enrollment completes, and
-the artifact is a downloadable PDF.
+In the target v1 flow, certificate issuance is triggered server-side when the final lesson of an
+enrollment completes, and the artifact is a downloadable PDF.
 
 ## 5. Dependency Rules
 
@@ -172,9 +219,9 @@ flowchart TD
 
 Additionally, `type:app` may only depend on `type:lib` — applications never import each other.
 
-These constraints were configured **before** the first project was generated, so the first project
-has to satisfy them rather than being retrofitted later. Every new project must declare both a
-`type:` and a `scope:` tag; a project with no tags is silently exempt from all of the rules above.
+These constraints were configured before the first project was generated. Every project must
+declare both a `type:` and a `scope:` tag; a project with no tags is silently exempt from all of the
+rules above.
 
 ## 6. Version Pinning
 
@@ -189,7 +236,7 @@ This is the most surprising part of the setup, so it is worth stating plainly.
 | Node                | `20.11.0` (`.nvmrc`) | Angular 17 supports Node 18 and 20 only — **not** Node 22+.                          |
 | `@angular/core`     | `17.3.12` (exact)    | See below.                                                                           |
 
-### Why `@angular/core` is a dependency of an empty workspace
+### Why `@angular/core` was installed before the first Angular app
 
 `@nx/angular@19.8.14` defaults to Angular `~18.2.0`. It only generates Angular 17 projects when it
 detects an installed Angular 17, in which case it uses its `angularV17` backward-compatibility map
@@ -215,14 +262,14 @@ The migration path out is documented in
 
 ## 7. Cross-Cutting Concerns
 
-| Concern    | Approach                                                                                                                     | Status                           |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| AuthN      | Email/password + OAuth, JWT issued by the API                                                                                | Not implemented                  |
-| AuthZ      | Learners may only read/modify their own enrollments, progress, certificates ([PRD §7](PRD.md#7-non-functional-requirements)) | Not implemented                  |
-| Secrets    | Local `.env`; hosted `DATABASE_URL` values in GitHub Environments. Never committed                                           | Database path active             |
-| Testing    | Jest for unit tests, Playwright for e2e                                                                                      | Configured as generator defaults |
-| Formatting | Prettier, enforced via `npm run format:check`                                                                                | Active                           |
-| CI         | Database checks plus manual HML/PRD migration and HML seed workflows                                                         | Database path active             |
+| Concern    | Approach                                                                                                                     | Status                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| AuthN      | Email/password + OAuth, JWT issued by the API                                                                                | Not implemented                           |
+| AuthZ      | Learners may only read/modify their own enrollments, progress, certificates ([PRD §7](PRD.md#7-non-functional-requirements)) | Not implemented                           |
+| Secrets    | Local `.env`; hosted `DATABASE_URL` values in GitHub Environments. Never committed                                           | Database path active                      |
+| Testing    | Jest for unit tests, Playwright for portal e2e, Jest for API e2e                                                            | Projects generated; initial coverage only |
+| Formatting | Prettier, enforced via `npm run format:check`                                                                                | Active                                    |
+| CI         | Database checks plus manual HML/PRD migration and HML seed workflows                                                         | Database path active                      |
 
 ## 8. Decisions
 

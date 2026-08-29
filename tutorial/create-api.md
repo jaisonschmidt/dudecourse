@@ -1,5 +1,9 @@
 # Tutorial: Create the Initial API
 
+> **Implementation record:** `apps/api` already exists. Do not rerun the application generator in
+> the current checkout. This tutorial preserves the intended construction of the initial slice; use
+> [API onboarding](../apps/api/ONBOARDING.md) for current endpoints, commands, and limitations.
+
 This tutorial explains how to create the first API app for Dude Course and implement the planned
 read-only endpoints:
 

@@ -10,9 +10,12 @@ of silently deviating.
 
 ## Current Status
 
-The Nx monorepo scaffold and `libs/database` project exist. The portal, API, UI, and shared domain
-projects have not been created yet. The Prisma schema now contains the v1 data model and its initial
-migration — see [ADR 0004](docs/adr/0004-initial-data-model.md).
+The Nx monorepo contains the active database foundation, a read-only catalog API, and an initial
+Angular portal for catalog and lesson-list browsing. The generated API and portal e2e projects have
+only initial coverage. The UI and shared-domain libraries have not been created yet. Authentication,
+enrollment, video playback, progress, and certificates remain unimplemented. The Prisma schema
+contains the v1 data model and its initial migration — see
+[ADR 0004](docs/adr/0004-initial-data-model.md).
 
 The stack has been chosen and recorded — see [docs/adr](docs/adr/). Do not re-decide it.
 
@@ -88,3 +91,5 @@ npm run db:migrate:deploy  # apply committed migrations locally
 # Guidances for agents
 - When implementing prefer TDD aproach
 - After implementing, verify if commands are working: npx nx lint APPNAME, npx nx test APPNAME and npx nx build APPNAME, if some of them fail correct the problems.
+
+I'm learning English and I'll try to communicate in English, when I snd a prompt verify if my Englishis appropriate and correct the English first, after continue with the task.

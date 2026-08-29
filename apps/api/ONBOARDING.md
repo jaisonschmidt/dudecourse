@@ -82,7 +82,9 @@ not make route behavior depend on test-only code paths.
 
 ## 6. Out of Scope for the Current Slice
 
-Do not add these without a PRD update and explicit direction:
+The following work is not implemented in the current API slice. The product features are already
+part of the PRD, while shared DTOs are part of the target architecture. Add them only as part of an
+explicitly scoped follow-up, and update the PRD only if product behavior changes:
 
 - Authentication, OAuth, JWT/session storage
 - Enrollment and lesson-progress endpoints

@@ -2,9 +2,9 @@
 
 Everything you need to be productive in this repository.
 
-> **Read this first:** the workspace is scaffolded but **empty**. There are no applications or
-> libraries yet. If you are here to create the first one, jump to
-> [Creating a project](#5-creating-a-project) — the exact commands are written out for you.
+> **Read this first:** the workspace is in early implementation. The database, API, and portal
+> projects exist; the reusable UI and shared-domain libraries are still planned. Do not regenerate
+> an existing project.
 
 ## 1. What this project is
 
@@ -20,6 +20,18 @@ watch lessons, and get a certificate when they finish.
 
 Do not invent features that are not in the PRD. If a request conflicts with it, raise the conflict
 rather than quietly deviating.
+
+### Current projects
+
+| Project              | Status                                  | Focused guide                                              |
+| -------------------- | --------------------------------------- | ---------------------------------------------------------- |
+| `apps/portal`        | Initial catalog and lesson-list slice   | [Portal onboarding](../apps/portal/ONBOARDING.md)          |
+| `apps/portal-e2e`    | Generated Playwright project            | —                                                          |
+| `apps/api`           | Read-only catalog API                   | [API onboarding](../apps/api/ONBOARDING.md)                |
+| `apps/api-e2e`       | Generated Jest e2e project              | —                                                          |
+| `libs/database`      | Active Prisma and PostgreSQL foundation | [Database onboarding](../libs/database/ONBOARDING.md)      |
+| `libs/ui`            | Planned; not created                    | —                                                          |
+| `libs/shared/domain` | Planned; not created                    | —                                                          |
 
 ## 2. Prerequisites
 
@@ -96,9 +108,9 @@ Targeting one project:
 
 ```sh
 npx nx build portal
-npx nx test ui
+npx nx test portal
 npx nx lint api
-npx nx run-many -t lint test --projects=portal,ui
+npx nx run-many -t lint test --projects=portal,api
 ```
 
 Useful diagnostics:
@@ -108,7 +120,7 @@ npx nx show project portal --web   # targets and config for one project
 npx nx reset                       # clear the Nx cache when something looks stale
 ```
 
-## 5. Creating a project
+## 5. Creating remaining projects
 
 Projects **must** be created with Nx generators, never by hand-copying folders. Generators wire up
 build targets, TypeScript path aliases, and lint config correctly.
@@ -116,38 +128,21 @@ build targets, TypeScript path aliases, and lint config correctly.
 Every project **must** declare a `type:` tag and a `scope:` tag. A project without tags is exempt
 from the module boundary rules, which silently defeats the architecture.
 
-Add `--dry-run` to any of these to preview without writing files.
+Add `--dry-run` to any generator command to preview it without writing files.
 
-### Portal — Angular 17 SPA
+### Existing applications
 
-```sh
-npx nx g @nx/angular:application portal \
-  --directory=apps/portal \
-  --tags=type:app,scope:portal
-```
-
-Style, prefix (`dc`), standalone components, Jest, and Playwright are already set as defaults in
-`nx.json` — you do not need to pass them.
-
-Afterwards, confirm the pin held:
-
-```sh
-node -p "require('./package.json').devDependencies['@angular/cli']"   # expect ~17.3.0
-```
-
-### API — Fastify
-
-```sh
-npx nx g @nx/node:application api \
-  --directory=apps/api \
-  --framework=fastify \
-  --tags=type:app,scope:api
-```
-
-`apps/api` already exists. For endpoints, dependency boundaries, and the local run/test/build flow,
-see [apps/api onboarding](../apps/api/ONBOARDING.md).
+`apps/portal` and `apps/api` already exist. Do not run their application generators again. Use the
+[portal onboarding](../apps/portal/ONBOARDING.md) and
+[API onboarding](../apps/api/ONBOARDING.md) for their local workflows. The
+[portal creation tutorial](../tutorial/create-portal.md) and
+[API creation tutorial](../tutorial/create-api.md) preserve how the initial slices were built; they
+are implementation references, not setup instructions for the current checkout.
 
 ### UI library — buildable Angular library
+
+`libs/ui` is planned but has not been created. When its implementation is approved, generate it
+with:
 
 ```sh
 npx nx g @nx/angular:library ui \
@@ -157,6 +152,9 @@ npx nx g @nx/angular:library ui \
 ```
 
 ### Shared domain library
+
+`libs/shared/domain` is planned but has not been created. When its implementation is approved,
+generate it with:
 
 ```sh
 npx nx g @nx/js:library domain \
@@ -173,13 +171,13 @@ see [libs/database onboarding](../libs/database/ONBOARDING.md).
 
 ## 6. Where does my code go?
 
-| You are writing…                         | It belongs in        | Import alias                |
-| ---------------------------------------- | -------------------- | --------------------------- |
-| A screen, route, or page                 | `apps/portal`        | —                           |
-| A reusable, presentational component     | `libs/ui`            | `@dudecourse/ui`            |
-| An HTTP endpoint or auth logic           | `apps/api`           | —                           |
-| A DTO or type used by portal **and** API | `libs/shared/domain` | `@dudecourse/shared-domain` |
-| A schema change, migration, or query     | `libs/database`      | `@dudecourse/database`      |
+| You are writing…                         | It belongs in        | Import alias                | Availability |
+| ---------------------------------------- | -------------------- | --------------------------- | ------------ |
+| A screen, route, or page                 | `apps/portal`        | —                           | Exists       |
+| A reusable, presentational component     | `libs/ui`            | `@dudecourse/ui`            | Planned      |
+| An HTTP endpoint or auth logic           | `apps/api`           | —                           | Exists       |
+| A DTO or type used by portal **and** API | `libs/shared/domain` | `@dudecourse/shared-domain` | Planned      |
+| A schema change, migration, or query     | `libs/database`      | `@dudecourse/database`      | Exists       |
 
 Rules of thumb:
 

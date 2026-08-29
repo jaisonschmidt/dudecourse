@@ -1,8 +1,9 @@
 # Dude Course
 
-Dude Course is a portal for sharing courses hosted on YouTube. The repository is an Nx monorepo; the
-database infrastructure exists, while the portal, API, UI, shared domain, and product data model are
-still planned.
+Dude Course is a portal for sharing courses hosted on YouTube. The Nx monorepo is in early
+implementation: the PostgreSQL/Prisma foundation and an initial read-only catalog flow through the
+Fastify API and Angular portal exist. The shared UI and domain libraries and the remaining v1
+learner flows are still planned.
 
 ## Documentation
 

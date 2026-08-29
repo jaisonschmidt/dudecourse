@@ -1,5 +1,9 @@
 # Tutorial: Create the Dude Course Portal
 
+> **Implementation record:** `apps/portal` already exists. Do not rerun the application generator
+> in the current checkout. This tutorial preserves the intended construction of the initial slice;
+> use [portal onboarding](../apps/portal/ONBOARDING.md) for current commands and limitations.
+
 This tutorial explains how to create the first Angular portal app for Dude Course and implement the
 first two learner-facing screens:
 
