@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CourseDetailDto, LessonDto } from '@dudecourse/shared/domain';
 import {
@@ -8,8 +8,9 @@ import {
   LinkDirective,
   ProgressComponent,
   StatePanelComponent,
+  ToastComponent,
 } from '@dudecourse/ui';
-import { Observable, catchError, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { CoursesService } from '../../core/services/courses.service';
 import { YoutubePlayerComponent } from './youtube-player.component';
 
@@ -29,6 +30,7 @@ interface LessonView {
     LinkDirective,
     ProgressComponent,
     StatePanelComponent,
+    ToastComponent,
     YoutubePlayerComponent,
   ],
   template: `
@@ -47,6 +49,7 @@ interface LessonView {
                 [trackingEnabled]="!!view.course.enrollment"
                 [baselinePercent]="view.lesson.progress?.watchedPercent ?? 0"
                 (watchedPercent)="saveProgress(view, $event)"
+                (videoEnded)="onVideoEnded(view)"
               />
               @if (!view.course.enrollment) {
                 <div class="notice">
@@ -55,9 +58,33 @@ interface LessonView {
                   ><a dcButton [routerLink]="['/courses', view.course.slug]">View enrollment</a>
                 </div>
               }
-              @if (message) {
-                <p class="error-message" role="status">{{ message }}</p>
+              @if (nextLesson; as next) {
+                <div class="notice next-lesson-notice">
+                  <strong>Lesson finished!</strong
+                  ><span>Ready for {{ next.position }}. {{ next.title }}?</span
+                  ><a
+                    dcButton
+                    [routerLink]="['/courses', view.course.slug, 'lessons', next.id]"
+                    >Go to next lesson</a
+                  >
+                </div>
               }
+              @if (courseComplete) {
+                <div class="notice">
+                  <strong>Course complete — nice work!</strong>
+                  @if (view.course.enrollment?.certificate; as certificate) {
+                    <span>Your certificate is ready.</span>
+                    <a dcButton [href]="courses.certificateUrl(certificate.id)">Get certificate</a>
+                  } @else {
+                    <span>You finished every lesson in this course.</span>
+                  }
+                </div>
+              }
+              <dc-toast
+                [message]="message"
+                [variant]="messageVariant"
+                (dismissed)="message = ''"
+              />
             </section>
             <aside>
               <h2>Your progress</h2>
@@ -166,9 +193,14 @@ interface LessonView {
 })
 export class LessonPageComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly courses = inject(CoursesService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  protected readonly courses = inject(CoursesService);
   message = '';
+  messageVariant: 'success' | 'error' = 'success';
+  nextLesson: LessonDto | null = null;
+  courseComplete = false;
   readonly view$: Observable<LessonView | null> = this.route.paramMap.pipe(
+    tap(() => this.resetNextLessonState()),
     switchMap((params) => {
       const slug = params.get('slug');
       const lessonId = params.get('lessonId');
@@ -196,10 +228,32 @@ export class LessonPageComponent {
         this.message = result.lessonProgress.completedAt
           ? 'Lesson complete — nice work!'
           : 'Progress saved.';
+        this.messageVariant = 'success';
+        this.cdr.markForCheck();
       },
       error: () => {
         this.message = 'We could not save progress. We will try again when you keep watching.';
+        this.messageVariant = 'error';
+        this.cdr.markForCheck();
       },
     });
   }
+
+  onVideoEnded(view: LessonView): void {
+    if (view.course.enrollment) {
+      // Reaching the end is the completion signal; don't rely on the accumulated watch-time estimate.
+      this.saveProgress(view, 100);
+    }
+    const lessons = view.course.lessons;
+    const index = lessons.findIndex((lesson) => lesson.id === view.lesson.id);
+    const next = index >= 0 ? lessons[index + 1] : undefined;
+    this.nextLesson = next ?? null;
+    this.courseComplete = !next;
+  }
+
+  resetNextLessonState(): void {
+    this.nextLesson = null;
+    this.courseComplete = false;
+  }
 }
+

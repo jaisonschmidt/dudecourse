@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, Directive, HostBinding, Input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Directive,
+  EventEmitter,
+  HostBinding,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 @Directive({
   selector: 'button[dcButton], a[dcButton]',
@@ -147,3 +158,42 @@ export class BadgeComponent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatePanelComponent {}
+
+@Component({
+  selector: 'dc-toast',
+  standalone: true,
+  template: `
+    @if (message) {
+      <p class="dc-toast" [class.dc-toast--error]="variant === 'error'" role="status">
+        {{ message }}
+      </p>
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ToastComponent implements OnChanges, OnDestroy {
+  @Input() message = '';
+  @Input() variant: 'success' | 'error' = 'success';
+  @Input() durationMs = 4000;
+  @Output() dismissed = new EventEmitter<void>();
+  private timer?: ReturnType<typeof setTimeout>;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['message'] && this.message) {
+      this.restartTimer();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.clearTimer();
+  }
+
+  private restartTimer(): void {
+    this.clearTimer();
+    this.timer = setTimeout(() => this.dismissed.emit(), this.durationMs);
+  }
+
+  private clearTimer(): void {
+    if (this.timer) clearTimeout(this.timer);
+  }
+}
