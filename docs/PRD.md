@@ -81,6 +81,14 @@ There is no in-app content-management/admin role in v1 (see
 - Minimum certificate content: learner name, course title, completion date, and a unique
   verification code.
 
+### 5.7 About Us
+
+- Anyone can view a public About Us page without authentication.
+- The page explains that Dude Course is a free portal for focused courses hosted on YouTube.
+- The page explains the learner journey: browse courses, review lessons, enroll, watch and track
+  progress, and receive a downloadable certificate after completing every lesson.
+- The page provides a clear link to the public course catalog.
+
 ## 6. Conceptual Data Entities
 
 These describe the concepts the product must represent — not a database schema.
