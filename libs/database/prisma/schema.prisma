@@ -53,6 +53,14 @@ model Course {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  /// Attribution fields for copyright compliance; all optional until backfilled.
+  videoAuthor          String?
+  youtubeChannel       String?
+  /// Optional external link with more info about the author.
+  authorInfoUrl        String?
+  language             String?
+  totalDurationMinutes Int?
+
   lessons     Lesson[]
   enrollments Enrollment[]
 

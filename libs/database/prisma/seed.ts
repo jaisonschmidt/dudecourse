@@ -14,6 +14,11 @@ const courses = [
     title: 'JavaScript Fundamentals',
     description: 'Core JavaScript language concepts, from values and types through async patterns.',
     published: true,
+    videoAuthor: 'The Net Ninja',
+    youtubeChannel: 'The Net Ninja',
+    authorInfoUrl: 'https://www.youtube.com/@NetNinja',
+    language: 'en',
+    totalDurationMinutes: 45,
     lessons: [
       { title: 'Values, Types and Variables', youtubeVideoId: 'lkIFF4maKMU' },
       { title: 'Functions and Scope', youtubeVideoId: 'iLWTnMzWtj4' },
@@ -25,6 +30,11 @@ const courses = [
     title: 'TypeScript for JavaScript Developers',
     description: 'Add static types to an existing JavaScript codebase without rewriting it.',
     published: true,
+    videoAuthor: null,
+    youtubeChannel: null,
+    authorInfoUrl: null,
+    language: null,
+    totalDurationMinutes: null,
     lessons: [
       { title: 'Why TypeScript', youtubeVideoId: 'zQnBQ4tB3ZA' },
       { title: 'Interfaces and Type Aliases', youtubeVideoId: 'VbW6vWTaHOA' },
@@ -36,18 +46,44 @@ const courses = [
     description:
       'Draft course kept unpublished so the catalog visibility rule is exercised locally.',
     published: false,
+    videoAuthor: null,
+    youtubeChannel: null,
+    authorInfoUrl: null,
+    language: null,
+    totalDurationMinutes: null,
     lessons: [{ title: 'Tables, Keys and Relationships', youtubeVideoId: 'zsjvFFKOm3c' }],
   },
 ];
 
 async function seed(): Promise<void> {
-  for (const { slug, title, description, published, lessons } of courses) {
+  for (const {
+    slug,
+    title,
+    description,
+    published,
+    videoAuthor,
+    youtubeChannel,
+    authorInfoUrl,
+    language,
+    totalDurationMinutes,
+    lessons,
+  } of courses) {
     const publishedAt = published ? new Date('2026-01-01T00:00:00.000Z') : null;
+    const attributes = {
+      title,
+      description,
+      publishedAt,
+      videoAuthor,
+      youtubeChannel,
+      authorInfoUrl,
+      language,
+      totalDurationMinutes,
+    };
 
     const course = await database.course.upsert({
       where: { slug },
-      update: { title, description, publishedAt },
-      create: { slug, title, description, publishedAt },
+      update: attributes,
+      create: { slug, ...attributes },
     });
 
     for (const [index, lesson] of lessons.entries()) {

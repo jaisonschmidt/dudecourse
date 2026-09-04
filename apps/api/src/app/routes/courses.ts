@@ -58,6 +58,11 @@ export function registerCourseRoutes(
       title: course.title,
       description: course.description,
       lessonCount: course._count.lessons,
+      videoAuthor: course.videoAuthor,
+      youtubeChannel: course.youtubeChannel,
+      authorInfoUrl: course.authorInfoUrl,
+      language: course.language,
+      totalDurationMinutes: course.totalDurationMinutes,
     }));
   });
 
@@ -96,6 +101,11 @@ export function registerCourseRoutes(
       title: course.title,
       description: course.description,
       lessonCount: course.lessons.length,
+      videoAuthor: course.videoAuthor,
+      youtubeChannel: course.youtubeChannel,
+      authorInfoUrl: course.authorInfoUrl,
+      language: course.language,
+      totalDurationMinutes: course.totalDurationMinutes,
       enrollment: enrollmentDto,
       lessons: course.lessons.map((lesson) => {
         const progress = enrollment?.progress.find((item) => item.lessonId === lesson.id);

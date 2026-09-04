@@ -94,7 +94,9 @@ There is no in-app content-management/admin role in v1 (see
 These describe the concepts the product must represent — not a database schema.
 
 - **User** — identity, credentials/OAuth link, display name.
-- **Course** — title, description, ordered list of lessons.
+- **Course** — title, description, ordered list of lessons, and optional attribution metadata
+  (video author, YouTube channel, author info link, language, total duration) kept for copyright
+  compliance.
 - **Lesson** — title, YouTube video reference, position within its course.
 - **Enrollment** — links a User to a Course; exists once the learner subscribes; tracks enrollment
   date.
@@ -139,8 +141,12 @@ These describe the concepts the product must represent — not a database schema
    through a reviewed, repository-owned content fixture process applied to local and homologation
    environments.
 2. ~~**Certificate fields**~~ **Resolved:** the certificate includes a unique verification serial
-   code in addition to learner name, course title, and completion date. Instructor name and course
-   duration are not included in v1.
+   code in addition to learner name, course title, and completion date. Instructor name and
+   certificate-level course duration are not included in v1. **Update:** course-level attribution
+   (video author, YouTube channel, author info link, language) and total course duration were added
+   to the Course entity as optional fields for copyright compliance — see
+   [ADR 0007](adr/0007-course-attribution-and-duration-fields.md). These are catalog/course-detail
+   metadata, not certificate fields.
 3. ~~**Completion threshold**~~ **Resolved:** a lesson completes at 90% watched. The value remains
    application configuration so it can change without a data migration.
 4. ~~**OAuth providers**~~ **Resolved:** Google is the OAuth provider for v1.

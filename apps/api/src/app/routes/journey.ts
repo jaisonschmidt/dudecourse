@@ -38,6 +38,11 @@ export function registerJourneyRoutes(app: FastifyInstance, database: PrismaClie
             title: enrollment.course.title,
             description: enrollment.course.description,
             lessonCount: totalLessons,
+            videoAuthor: enrollment.course.videoAuthor,
+            youtubeChannel: enrollment.course.youtubeChannel,
+            authorInfoUrl: enrollment.course.authorInfoUrl,
+            language: enrollment.course.language,
+            totalDurationMinutes: enrollment.course.totalDurationMinutes,
           },
           enrollment: {
             id: enrollment.id,

@@ -6,6 +6,11 @@ const course = {
   title: 'JavaScript Fundamentals',
   description: 'Learn the language foundations with focused lessons.',
   lessonCount: 1,
+  videoAuthor: null,
+  youtubeChannel: null,
+  authorInfoUrl: null,
+  language: null,
+  totalDurationMinutes: null,
 };
 const lesson = {
   id: 'lesson-1',

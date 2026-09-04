@@ -27,6 +27,11 @@ export interface CourseSummaryDto {
   title: string;
   description: string;
   lessonCount: number;
+  videoAuthor: string | null;
+  youtubeChannel: string | null;
+  authorInfoUrl: string | null;
+  language: string | null;
+  totalDurationMinutes: number | null;
 }
 
 export interface LessonProgressDto {

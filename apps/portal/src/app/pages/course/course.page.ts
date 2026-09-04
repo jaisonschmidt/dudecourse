@@ -36,7 +36,32 @@ import { CoursesService } from '../../core/services/courses.service';
             <div>
               <p class="dc-eyebrow">Free course</p>
               <h1>{{ course.title }}</h1>
-              <p>{{ course.description }}</p>
+              <p class="course-description">{{ course.description }}</p>
+              @if (course.videoAuthor || course.youtubeChannel || course.language || course.totalDurationMinutes) {
+                <ul class="course-meta">
+                  @if (course.videoAuthor) {
+                    <li>
+                      By
+                      @if (course.authorInfoUrl) {
+                        <a dcLink [href]="course.authorInfoUrl" target="_blank" rel="noopener">{{
+                          course.videoAuthor
+                        }}</a>
+                      } @else {
+                        {{ course.videoAuthor }}
+                      }
+                    </li>
+                  }
+                  @if (course.youtubeChannel) {
+                    <li>{{ course.youtubeChannel }}</li>
+                  }
+                  @if (course.language) {
+                    <li>{{ course.language }}</li>
+                  }
+                  @if (course.totalDurationMinutes) {
+                    <li>{{ course.totalDurationMinutes }} min</li>
+                  }
+                </ul>
+              }
             </div>
             <dc-card class="enrollment-card">
               <strong>{{ course.lessonCount }} focused lessons</strong>
@@ -111,11 +136,21 @@ import { CoursesService } from '../../core/services/courses.service';
         line-height: 1;
         margin: 0.3rem 0 1rem;
       }
-      .course-heading > div > p:last-child {
+      .course-description {
         max-width: 42rem;
         color: var(--dc-color-muted);
         font-size: 1.1rem;
         line-height: 1.7;
+      }
+      .course-meta {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1rem;
+        margin: 0.75rem 0 0;
+        padding: 0;
+        color: var(--dc-color-muted);
+        font-size: 0.95rem;
       }
       .enrollment-card {
         display: block;

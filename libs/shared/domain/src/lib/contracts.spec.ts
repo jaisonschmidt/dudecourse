@@ -8,6 +8,11 @@ describe('shared domain contracts', () => {
       title: 'Course',
       description: 'Description',
       lessonCount: 0,
+      videoAuthor: null,
+      youtubeChannel: null,
+      authorInfoUrl: null,
+      language: null,
+      totalDurationMinutes: null,
       lessons: [],
       enrollment: null,
     };
