@@ -4,6 +4,7 @@
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
       >Courses</a
     >
+    <a routerLink="/about" routerLinkActive="active">About Us</a>
     @if (auth.user()) {
       <a routerLink="/journey" routerLinkActive="active">My Journey</a>
     }
