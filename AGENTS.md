@@ -10,12 +10,12 @@ of silently deviating.
 
 ## Current Status
 
-The Nx monorepo contains the active database foundation, a read-only catalog API, and an initial
-Angular portal for catalog and lesson-list browsing. The generated API and portal e2e projects have
-only initial coverage. The UI and shared-domain libraries have not been created yet. Authentication,
-enrollment, video playback, progress, and certificates remain unimplemented. The Prisma schema
-contains the v1 data model and its initial migration — see
-[ADR 0004](docs/adr/0004-initial-data-model.md).
+The Nx monorepo contains the local MVP: PostgreSQL/Prisma persistence, Fastify API, Angular portal,
+shared UI and domain libraries, authentication, enrollment, YouTube playback, progress, learner
+journey, and downloadable certificates. Automated coverage exists but should continue expanding. See
+[ADR 0004](docs/adr/0004-initial-data-model.md),
+[ADR 0005](docs/adr/0005-mvp-authentication-and-session.md), and
+[ADR 0006](docs/adr/0006-certificate-generation-and-delivery.md).
 
 The stack has been chosen and recorded — see [docs/adr](docs/adr/). Do not re-decide it.
 
@@ -24,6 +24,10 @@ The stack has been chosen and recorded — see [docs/adr](docs/adr/). Do not re-
 - [docs/ONBOARDING.md](docs/ONBOARDING.md) — setup, commands, and the exact generator command for
   each planned project.
 - [docs/DATABASE.md](docs/DATABASE.md) — local PostgreSQL, migrations, and HML/PRD promotion.
+- [docs/MVP_BASELINE.md](docs/MVP_BASELINE.md) — implemented local MVP inventory and known gaps.
+- [docs/CONFIGURATION.md](docs/CONFIGURATION.md) — canonical runtime configuration inventory.
+- [docs/PRODUCTION_RUNBOOK.md](docs/PRODUCTION_RUNBOOK.md) — production prerequisites, release,
+  smoke checks, and recovery procedures.
 
 ## Stack (decided — see [ADR 0001](docs/adr/0001-tech-stack.md))
 
@@ -65,8 +69,8 @@ npm run db:migrate:deploy  # apply committed migrations locally
 - **Create an onboarding document for every new app or library.** Add an `ONBOARDING.md` in the
   project root (for example, `apps/<name>/ONBOARDING.md` or `libs/<name>/ONBOARDING.md`) with at
   least: project purpose, main commands, local run/test/build flow, dependency-boundary notes, and
-  links to canonical docs. Add a short link to that onboarding from [docs/ONBOARDING.md](docs/ONBOARDING.md)
-  so new contributors can discover it quickly.
+  links to canonical docs. Add a short link to that onboarding from
+  [docs/ONBOARDING.md](docs/ONBOARDING.md) so new contributors can discover it quickly.
 - **Every project must declare a `type:` and a `scope:` tag.** An untagged project is silently
   exempt from the module boundary rules, which defeats the architecture.
 - **Respect the dependency rules** in [ARCHITECTURE.md §5](docs/ARCHITECTURE.md#5-dependency-rules).
@@ -89,7 +93,10 @@ npm run db:migrate:deploy  # apply committed migrations locally
 - Keep this file (`AGENTS.md`) up to date as the project evolves.
 
 # Guidances for agents
-- When implementing prefer TDD aproach
-- After implementing, verify if commands are working: npx nx lint APPNAME, npx nx test APPNAME and npx nx build APPNAME, if some of them fail correct the problems.
 
-I'm learning English and I'll try to communicate in English, when I snd a prompt verify if my Englishis appropriate and correct the English first, after continue with the task.
+- When implementing prefer TDD aproach
+- After implementing, verify if commands are working: npx nx lint APPNAME, npx nx test APPNAME and
+  npx nx build APPNAME, if some of them fail correct the problems.
+
+I'm learning English and I'll try to communicate in English, when I snd a prompt verify if my
+Englishis appropriate and correct the English first, after continue with the task.

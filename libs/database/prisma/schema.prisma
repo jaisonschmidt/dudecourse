@@ -113,6 +113,8 @@ model Certificate {
   id           String   @id @default(uuid()) @db.Uuid
   enrollmentId String   @unique @db.Uuid
   serialCode   String   @unique
+  learnerName  String
+  courseTitle  String
   issuedAt     DateTime @default(now())
 
   enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)

@@ -12,7 +12,7 @@ Use this file for day-to-day operations. Use the repository guides for deeper po
 
 ## 1. What This App Owns
 
-`apps/api` is a Fastify application that exposes read-only HTTP endpoints backed by
+`apps/api` is the Fastify application that owns authentication and all PostgreSQL access through
 `@dudecourse/database`.
 
 - App factory and routes: `apps/api/src/app/app.ts`
@@ -23,16 +23,23 @@ route testing possible via Fastify's `.inject()` without opening a network port.
 
 ## 2. Endpoints
 
-| Endpoint | Purpose | Rules |
-| --- | --- | --- |
-| `GET /healthz` | Liveness check | No database access, no auth, stable response `{ "ok": true }` |
-| `GET /courses` | List catalog courses | Returns only courses where `publishedAt` is not null, ordered by `title` ascending |
-| `GET /courses/:slug/lessons` | List lessons for a course | Looked up by `slug`; lessons ordered by `position` ascending; returns `404` if the course does not exist or is unpublished |
+| Endpoint                                                                       | Purpose                | Rules                                                                              |
+| ------------------------------------------------------------------------------ | ---------------------- | ---------------------------------------------------------------------------------- |
+| `GET /healthz`                                                                 | Liveness check         | No database access, no auth, stable response `{ "ok": true }`                      |
+| `GET /courses`                                                                 | List catalog courses   | Returns only courses where `publishedAt` is not null, ordered by `title` ascending |
+| `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | Email/password session | JWT is stored in an HTTP-only cookie                                               |
+| `GET /auth/google`, `GET /auth/google/callback`                                | Google sign-in         | Requires local Google credentials                                                  |
+| `GET /courses/:slug`                                                           | Course detail          | Public lessons plus enrollment/progress for the signed-in learner                  |
+| `POST /courses/:courseId/enrollments`                                          | Enroll                 | Authenticated and idempotent                                                       |
+| `PUT /enrollments/:enrollmentId/lessons/:lessonId/progress`                    | Save viewing progress  | Authenticated; completes at 90%                                                    |
+| `GET /me/journey`                                                              | Learner dashboard      | Authenticated and owner-scoped                                                     |
+| `GET /certificates/:certificateId/pdf`                                         | Download certificate   | Authenticated and owner-scoped                                                     |
 
 ## 3. Dependency Boundary
 
 - Import the shared client only via `import { database } from '@dudecourse/database';`.
-- Do not import `@prisma/client` directly from app code — the database library owns client creation.
+- Prisma types and enums may be imported from `@prisma/client`, but do not instantiate another
+  `PrismaClient` in application code — the database library owns client creation.
 - Only the API app may depend on `@dudecourse/database`. The portal and `libs/ui` must never import
   it.
 
@@ -52,7 +59,7 @@ Manual checks:
 ```sh
 curl http://localhost:3000/healthz
 curl http://localhost:3000/courses
-curl http://localhost:3000/courses/<course-slug>/lessons
+curl http://localhost:3000/courses/<course-slug>
 ```
 
 Validation:
@@ -80,15 +87,17 @@ For database-backed routes, either run focused integration checks against the lo
 or refactor route registration to accept a database dependency and inject a mock in unit tests. Do
 not make route behavior depend on test-only code paths.
 
-## 6. Out of Scope for the Current Slice
+The API e2e suite expects an API process and uses unique test accounts. Run it against the
+disposable database rather than the development database:
 
-The following work is not implemented in the current API slice. The product features are already
-part of the PRD, while shared DTOs are part of the target architecture. Add them only as part of an
-explicitly scoped follow-up, and update the PRD only if product behavior changes:
+```sh
+npm run db:test:up
+# Start the API in another terminal with DATABASE_URL pointing at localhost:5433.
+npx nx run api-e2e:e2e
+npm run db:test:down
+```
 
-- Authentication, OAuth, JWT/session storage
-- Enrollment and lesson-progress endpoints
-- Certificate or PDF generation
-- New database tables or migrations
-- Admin/content-management endpoints
-- A shared domain DTO library
+## 6. Current Boundaries
+
+Password recovery, email verification, persistent session revocation, content administration, and
+hosted deployment remain outside the local MVP.

@@ -2,36 +2,37 @@
 
 Everything you need to be productive in this repository.
 
-> **Read this first:** the workspace is in early implementation. The database, API, and portal
-> projects exist; the reusable UI and shared-domain libraries are still planned. Do not regenerate
-> an existing project.
+> **Read this first:** the local MVP projects exist. Do not regenerate an existing project.
 
 ## 1. What this project is
 
 Dude Course is a portal for sharing courses hosted on YouTube. Learners browse a catalog, enroll,
 watch lessons, and get a certificate when they finish.
 
-| Document                           | Purpose                                                  |
-| ---------------------------------- | -------------------------------------------------------- |
-| [PRD.md](PRD.md)                   | **What** the product does. Source of truth for behavior. |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | **How** the system is structured.                        |
-| [adr/](adr/)                       | **Why** each technical decision was made.                |
-| [AGENTS.md](../AGENTS.md)          | Working agreements, including for AI assistants.         |
+| Document                                       | Purpose                                                  |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| [PRD.md](PRD.md)                               | **What** the product does. Source of truth for behavior. |
+| [ARCHITECTURE.md](ARCHITECTURE.md)             | **How** the system is structured.                        |
+| [adr/](adr/)                                   | **Why** each technical decision was made.                |
+| [MVP_BASELINE.md](MVP_BASELINE.md)             | **What is implemented** in the current local baseline.   |
+| [CONFIGURATION.md](CONFIGURATION.md)           | **Where** runtime values and secrets are configured.     |
+| [PRODUCTION_RUNBOOK.md](PRODUCTION_RUNBOOK.md) | **How** to prepare and operate hosted releases.          |
+| [AGENTS.md](../AGENTS.md)                      | Working agreements, including for AI assistants.         |
 
 Do not invent features that are not in the PRD. If a request conflicts with it, raise the conflict
 rather than quietly deviating.
 
 ### Current projects
 
-| Project              | Status                                  | Focused guide                                              |
-| -------------------- | --------------------------------------- | ---------------------------------------------------------- |
-| `apps/portal`        | Initial catalog and lesson-list slice   | [Portal onboarding](../apps/portal/ONBOARDING.md)          |
-| `apps/portal-e2e`    | Generated Playwright project            | —                                                          |
-| `apps/api`           | Read-only catalog API                   | [API onboarding](../apps/api/ONBOARDING.md)                |
-| `apps/api-e2e`       | Generated Jest e2e project              | —                                                          |
-| `libs/database`      | Active Prisma and PostgreSQL foundation | [Database onboarding](../libs/database/ONBOARDING.md)      |
-| `libs/ui`            | Planned; not created                    | —                                                          |
-| `libs/shared/domain` | Planned; not created                    | —                                                          |
+| Project              | Status                                  | Focused guide                                            |
+| -------------------- | --------------------------------------- | -------------------------------------------------------- |
+| `apps/portal`        | Local learner MVP                       | [Portal onboarding](../apps/portal/ONBOARDING.md)        |
+| `apps/portal-e2e`    | Generated Playwright project            | —                                                        |
+| `apps/api`           | Local MVP API                           | [API onboarding](../apps/api/ONBOARDING.md)              |
+| `apps/api-e2e`       | Generated Jest e2e project              | —                                                        |
+| `libs/database`      | Active Prisma and PostgreSQL foundation | [Database onboarding](../libs/database/ONBOARDING.md)    |
+| `libs/ui`            | Active presentational library           | [UI onboarding](../libs/ui/ONBOARDING.md)                |
+| `libs/shared/domain` | Active API contract library             | [Domain onboarding](../libs/shared/domain/ONBOARDING.md) |
 
 ## 2. Prerequisites
 
@@ -93,8 +94,12 @@ Nx caches results, so re-running an unchanged target is nearly instant.
 | `npm run build`        | Build every project                       |
 | `npm run format`       | Apply Prettier formatting                 |
 | `npm run format:check` | Verify formatting (use in CI)             |
+| `npm run local:setup`  | Apply migrations, generate client, seed   |
+| `npm run dev`          | Start API and portal together             |
 | `npm run db:up`        | Start local PostgreSQL                    |
 | `npm run db:down`      | Stop local PostgreSQL                     |
+| `npm run db:test:up`   | Start the disposable test PostgreSQL      |
+| `npm run db:test:down` | Stop the disposable test PostgreSQL       |
 
 Scoped to what you actually changed — prefer these while working:
 
@@ -133,32 +138,30 @@ Add `--dry-run` to any generator command to preview it without writing files.
 ### Existing applications
 
 `apps/portal` and `apps/api` already exist. Do not run their application generators again. Use the
-[portal onboarding](../apps/portal/ONBOARDING.md) and
-[API onboarding](../apps/api/ONBOARDING.md) for their local workflows. The
-[portal creation tutorial](../tutorial/create-portal.md) and
+[portal onboarding](../apps/portal/ONBOARDING.md) and [API onboarding](../apps/api/ONBOARDING.md)
+for their local workflows. The [portal creation tutorial](../tutorial/create-portal.md) and
 [API creation tutorial](../tutorial/create-api.md) preserve how the initial slices were built; they
 are implementation references, not setup instructions for the current checkout.
 
 ### UI library — buildable Angular library
 
-`libs/ui` is planned but has not been created. When its implementation is approved, generate it
-with:
+`libs/ui` already exists. Do not run its generator again. Its original generator command was:
 
 ```sh
 npx nx g @nx/angular:library ui \
-  --directory=libs/ui \
+  --directory=libs \
   --buildable \
   --tags=type:lib,scope:ui
 ```
 
 ### Shared domain library
 
-`libs/shared/domain` is planned but has not been created. When its implementation is approved,
-generate it with:
+`libs/shared/domain` already exists. Do not run its generator again. Its original generator command
+was:
 
 ```sh
 npx nx g @nx/js:library domain \
-  --directory=libs/shared/domain \
+  --directory=libs/shared \
   --bundler=none \
   --tags=type:lib,scope:shared
 ```
@@ -166,17 +169,17 @@ npx nx g @nx/js:library domain \
 ### Database library
 
 `libs/database` already exists. Do not generate it again. Follow [DATABASE.md](DATABASE.md) for
-schema changes, local Docker commands, seeding, and hosted promotion. For a focused quick-start,
-see [libs/database onboarding](../libs/database/ONBOARDING.md).
+schema changes, local Docker commands, seeding, and hosted promotion. For a focused quick-start, see
+[libs/database onboarding](../libs/database/ONBOARDING.md).
 
 ## 6. Where does my code go?
 
 | You are writing…                         | It belongs in        | Import alias                | Availability |
 | ---------------------------------------- | -------------------- | --------------------------- | ------------ |
 | A screen, route, or page                 | `apps/portal`        | —                           | Exists       |
-| A reusable, presentational component     | `libs/ui`            | `@dudecourse/ui`            | Planned      |
+| A reusable, presentational component     | `libs/ui`            | `@dudecourse/ui`            | Active       |
 | An HTTP endpoint or auth logic           | `apps/api`           | —                           | Exists       |
-| A DTO or type used by portal **and** API | `libs/shared/domain` | `@dudecourse/shared-domain` | Planned      |
+| A DTO or type used by portal **and** API | `libs/shared/domain` | `@dudecourse/shared/domain` | Active       |
 | A schema change, migration, or query     | `libs/database`      | `@dudecourse/database`      | Exists       |
 
 Rules of thumb:

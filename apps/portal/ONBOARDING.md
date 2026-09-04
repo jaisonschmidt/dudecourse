@@ -16,40 +16,36 @@ product and architecture decisions:
 `apps/portal` is the learner-facing Angular 17 single-page application. It owns browser routing,
 pages, view state, and communication with the API.
 
-The current slice contains:
+The local MVP contains:
 
 - A home route (`/`) that loads and displays published courses.
-- A course route (`/courses/:slug`) that loads and displays the course's ordered lesson list.
-- `CoursesService`, which reads the API base URL from the Angular environment.
-
-Authentication, enrollment, YouTube playback, progress tracking, and certificates are target v1
-features but are not implemented in the portal yet.
+- Course detail and public lesson playback routes.
+- Email/password and Google authentication routes.
+- Enrollment, tracked playback, My Journey, and certificate downloads.
+- `CoursesService`, `AuthService`, and shared contracts from `@dudecourse/shared/domain`.
 
 ## 2. Dependency Boundary
 
 - Obtain all persistent data through the API.
 - Never import `@dudecourse/database` or `@prisma/client` into the portal.
 - The portal may depend only on libraries tagged `scope:ui` and `scope:shared`.
-- Keep HTTP and route state in the portal. The planned `libs/ui` library is presentational only.
-- Move contracts shared with the API to the planned `libs/shared/domain` library once that project
-  exists.
+- Keep HTTP and route state in the portal. `libs/ui` is presentational only.
+- Keep shared API contracts in `libs/shared/domain`.
 
-These rules are defined in
-[Architecture §5](../../docs/ARCHITECTURE.md#5-dependency-rules) and enforced by lint boundaries.
+These rules are defined in [Architecture §5](../../docs/ARCHITECTURE.md#5-dependency-rules) and
+enforced by lint boundaries.
 
-## 3. API Contract Used by the Current Slice
+## 3. API Contract
 
 The portal currently depends on:
 
-| Endpoint                     | Portal use                       |
-| ---------------------------- | -------------------------------- |
-| `GET /courses`               | Populate the catalog             |
-| `GET /courses/:slug/lessons` | Populate the ordered lesson list |
-
-`CoursesService.getCourse()` currently requests `GET /courses/:slug`, but that API endpoint does
-not exist. The current course page does not call this method, so it renders a lesson list without
-course title or description. Resolve the contract before relying on `getCourse()` or describing the
-course-detail slice as complete.
+| Endpoint                                    | Portal use                                |
+| ------------------------------------------- | ----------------------------------------- |
+| `GET /courses`                              | Populate the catalog                      |
+| `GET /courses/:slug`                        | Course detail, lessons, and learner state |
+| `POST /courses/:id/enrollments`             | Enroll in a course                        |
+| `PUT /enrollments/:id/lessons/:id/progress` | Persist watched progress                  |
+| `GET /me/journey`                           | Populate My Journey                       |
 
 ## 4. Local Run Flow
 
@@ -65,14 +61,10 @@ npm run db:generate
 npm run db:seed
 ```
 
-Start the API and portal in separate terminals:
+Start the API and portal together:
 
 ```sh
-npx nx serve api
-```
-
-```sh
-npx nx serve portal
+npm run dev
 ```
 
 The default development URLs are:
@@ -96,8 +88,7 @@ Run the Playwright project when the change affects browser behavior:
 npx nx e2e portal-e2e
 ```
 
-The current portal and e2e tests are still close to their generated examples. Add focused tests for
-services and user-visible page states as each slice is completed.
+Keep unit and Playwright coverage aligned with user-visible behavior.
 
 ## 6. Implementation Conventions
 
@@ -109,10 +100,5 @@ services and user-visible page states as each slice is completed.
 
 ## 7. Current Limitations
 
-- Catalog and lesson routes do not require authentication yet.
-- The course page shows lessons but not full course details or an explicit not-found state.
-- Lesson videos are not embedded.
-- Enrollment, watch progress, completion, and certificates are not implemented.
-- The shared UI and shared-domain libraries do not exist yet.
-
-Treat these as incomplete PRD work, not as changes to the target product scope.
+The local MVP does not include password recovery, email verification, persistent session revocation,
+content administration, deployment, or internationalization.

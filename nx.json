@@ -54,6 +54,11 @@
     },
     "e2e-ci--**/*": {
       "dependsOn": ["^build"]
+    },
+    "@nx/angular:ng-packagr-lite": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "plugins": [
@@ -87,9 +92,9 @@
       "prefix": "dc"
     },
     "@nx/angular:library": {
-      "style": "scss",
       "linter": "eslint",
       "unitTestRunner": "jest",
+      "style": "scss",
       "standalone": true,
       "prefix": "dc"
     },

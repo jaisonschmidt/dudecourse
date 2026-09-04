@@ -20,7 +20,9 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@dudecourse/database": ["libs/database/src/index.ts"]
+      "@dudecourse/database": ["libs/database/src/index.ts"],
+      "@dudecourse/shared/domain": ["libs/shared/domain/src/index.ts"],
+      "@dudecourse/ui": ["libs/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

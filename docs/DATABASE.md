@@ -3,7 +3,9 @@
 `libs/database` owns the Prisma schema, generated client boundary, migration history, and seed entry
 point. The API will be its only application consumer. The schema implements the PRD entities across
 seven tables — `users`, `auth_accounts`, `courses`, `lessons`, `enrollments`, `lesson_progress`, and
-`certificates`. The rationale for that structure is [ADR 0004](adr/0004-initial-data-model.md).
+`certificates`. Certificates snapshot learner and course names at issuance, and watched percentages
+are constrained to 0–100. See [ADR 0004](adr/0004-initial-data-model.md) and
+[ADR 0006](adr/0006-certificate-generation-and-delivery.md).
 
 ## Environments
 

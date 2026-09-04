@@ -15,5 +15,21 @@ services:
     volumes:
       - database-data:/var/lib/postgresql/data
 
+  database-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dudecourse_test
+      POSTGRES_PASSWORD: dudecourse_test
+      POSTGRES_USER: dudecourse_test
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dudecourse_test -d dudecourse_test']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - '127.0.0.1:5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+
 volumes:
   database-data:

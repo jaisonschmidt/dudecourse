@@ -43,12 +43,13 @@ There is no in-app content-management/admin role in v1 (see
 ### 5.1 Authentication
 
 - Learners can sign up and log in using email/password.
-- Learners can sign up and log in using an OAuth provider (exact provider(s) to be decided later).
+- Learners can sign up and log in using Google OAuth.
 - A learner's identity is required before enrolling in a course or tracking progress.
 
 ### 5.2 Catalog Browsing
 
-- Any authenticated learner can view the full list of available courses.
+- Anyone can view the full list of available courses. Authentication is required only for enrollment
+  and progress tracking.
 - Each catalog entry shows at least: course title, description, and number of lessons.
 
 ### 5.3 Course Detail
@@ -64,10 +65,10 @@ There is no in-app content-management/admin role in v1 (see
 
 ### 5.5 Lesson Playback & Progress Tracking
 
-- Each lesson plays its associated YouTube video inside the portal.
-- A lesson is automatically marked as completed based on the learner's watch progress reaching a
-  defined completion threshold (percentage of the video watched), without requiring manual
-  confirmation from the learner.
+- Each lesson plays its associated YouTube video inside the portal, including for visitors. Viewing
+  before enrollment is not credited retroactively.
+- A lesson is automatically marked as completed when the learner reaches 90% watched, without
+  requiring manual confirmation from the learner.
 - The portal tracks, per learner and per course, which lessons are completed and the overall
   percentage of course completion.
 
@@ -132,7 +133,6 @@ These describe the concepts the product must represent — not a database schema
 2. ~~**Certificate fields**~~ **Resolved:** the certificate includes a unique verification serial
    code in addition to learner name, course title, and completion date. Instructor name and course
    duration are not included in v1.
-3. **Completion threshold**: exact watch-percentage required to mark a lesson complete is not yet
-   defined (e.g., 90%, 95%, 100%). The stored data records the watched percentage, so this value is
-   application configuration and can change without a data migration.
-4. **OAuth providers**: which specific provider(s) (Google, GitHub, etc.) should be supported.
+3. ~~**Completion threshold**~~ **Resolved:** a lesson completes at 90% watched. The value remains
+   application configuration so it can change without a data migration.
+4. ~~**OAuth providers**~~ **Resolved:** Google is the OAuth provider for v1.

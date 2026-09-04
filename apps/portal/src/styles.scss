@@ -1,1 +1,91 @@
-/* You can add global styles to this file, and also import other style files */
+main {
+  min-height: 65vh;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+h1,
+h2,
+h3 {
+  letter-spacing: -0.035em;
+}
+.page {
+  width: min(calc(100% - 2rem), var(--dc-shell));
+  margin-inline: auto;
+  padding: 3rem 0;
+}
+.page-heading {
+  max-width: 46rem;
+  margin-bottom: 2rem;
+}
+.page-heading h1 {
+  margin-bottom: 0.65rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+}
+.page-heading p {
+  color: var(--dc-color-muted);
+  line-height: 1.7;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.muted {
+  color: var(--dc-color-muted);
+}
+.error-message {
+  color: var(--dc-color-error);
+  font-weight: 650;
+}
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+.field label {
+  font-weight: 750;
+}
+.field small {
+  color: var(--dc-color-error);
+}
+.auth-card {
+  width: min(calc(100% - 2rem), 31rem);
+  margin: 3rem auto;
+}
+.auth-card form {
+  display: grid;
+  gap: 1.15rem;
+}
+.auth-card h1 {
+  font-size: 2.4rem;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--dc-color-muted);
+  margin: 1.1rem 0;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: var(--dc-color-border);
+}
+@media (max-width: 52rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 36rem) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .page {
+    padding-top: 2rem;
+  }
+}

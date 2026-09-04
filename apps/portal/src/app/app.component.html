@@ -1,1 +1,30 @@
-<router-outlet></router-outlet>
+<dc-header>
+  <a class="brand" routerLink="/" aria-label="Dude Course home"><dc-logo /></a>
+  <nav aria-label="Primary navigation">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      >Courses</a
+    >
+    @if (auth.user()) {
+      <a routerLink="/journey" routerLinkActive="active">My Journey</a>
+    }
+  </nav>
+  <div class="account-actions">
+    @if (auth.user(); as user) {
+      <span class="user-name">Hi, {{ user.displayName }}</span>
+      <button dcButton variant="ghost" type="button" (click)="logout()">Log out</button>
+    } @else {
+      <a dcButton variant="ghost" routerLink="/login">Log in</a>
+      <a dcButton routerLink="/register">Join free</a>
+    }
+  </div>
+</dc-header>
+
+<router-outlet />
+
+<dc-footer>
+  <div class="footer-content">
+    <dc-logo />
+    <p>Free courses. Real progress. Your next skill starts here.</p>
+    <span>© {{ year }} Dude Course</span>
+  </div>
+</dc-footer>
